@@ -1,4 +1,447 @@
 
+// import express from 'express';
+// import { createServer } from 'node:http';
+// import { join } from 'node:path';
+// import { Server } from 'socket.io';
+// import { createClient } from 'redis';
+// import { createAdapter } from '@socket.io/redis-adapter';
+// import cors from 'cors';
+
+// const app = express();
+// app.use(cors({ origin: 'http://localhost:5173' }));
+
+// const server = createServer(app);
+
+// const localDomains = [
+//   'http://localhost:3000',
+// ];
+
+// const io = new Server(server, {
+//   cors: {
+
+//     origin: 'http://localhost:5173',
+
+
+//   },
+//   maxHttpBufferSize: 1e8,
+// });   
+
+// app.get('/', (req, res) => {
+//   res.sendFile(join(__dirname, 'index.html'));
+// });
+
+// io.on('connection', (socket) => {
+//   console.log('A new client connected');
+
+//   socket.on('message', (data) => {
+//     console.log('Received message:', data);
+//     io.emit('message', data);
+//   });
+
+//   socket.on('disconnect', () => {
+//     console.log('Client disconnected');
+//   });
+// });
+
+// let pubClient, subClient;
+
+// (async () => {
+//   pubClient = createClient({ url: "redis://localhost:6379" });
+//   subClient = pubClient.duplicate();
+
+//   pubClient.on('error', (err) => console.error('Redis Pub Client Error:', err));
+//   subClient.on('error', (err) => console.error('Redis Sub Client Error:', err));
+
+//   await Promise.all([pubClient.connect(), subClient.connect()]);
+
+//   io.adapter(createAdapter(pubClient, subClient));
+
+//   const port = process.env.PORT || 4000;
+//   server.listen(port, () => {
+//     console.log(`Server listening on port ${port}`);
+//   });
+
+
+//   process.on('SIGINT', async () => {
+//     console.log('SIGINT signal received.');
+//     await shutdown();
+//   });
+
+//   process.on('SIGTERM', async () => {
+//     console.log('SIGTERM signal received.');
+//     await shutdown();
+//   });
+// })();
+
+// async function shutdown() {
+//   console.log('Shutting down server...');
+//   io.close(() => {
+//     console.log('Socket.IO server closed.');
+//     server.close(async () => {
+//       console.log('HTTP server closed.');
+//       await pubClient.disconnect();
+//       await subClient.disconnect();
+//       console.log('Redis clients disconnected.');
+//       process.exit(0);
+//     });
+//   });
+// }
+
+
+
+// import express from 'express';
+// import { createServer } from 'node:http';
+// import { join } from 'node:path';
+// import { Server } from 'socket.io';
+// import { createClient } from 'redis';
+// import { createAdapter } from '@socket.io/redis-adapter';
+// import cors from 'cors';
+
+// const app = express();
+// app.use(cors({ origin: 'http://localhost:5173' }));
+
+// const server = createServer(app);
+
+// const localDomains = [
+//   'http://localhost:3000',
+// ];
+
+// const io = new Server(server, {
+//   cors: {
+//     origin: 'http://localhost:5173',
+//   },
+//   maxHttpBufferSize: 1e8,
+// });
+
+// app.get('/', (req, res) => {
+//   res.sendFile(join(__dirname, 'index.html'));
+// });
+
+// io.on('connection', (socket) => {
+//   console.log('A new client connected');
+
+//   socket.on('join', async (userId) => {
+//     socket.join(userId);
+
+//     // Fetch and send pending notifications
+//     const notifications = await pubClient.lrange(`notifications:${userId}`, 0, -1);
+//     notifications.forEach((notification) => {
+//       socket.emit('message', notification);
+//     });
+
+//     // Remove the notifications from the list after sending
+//     await pubClient.del(`notifications:${userId}`);
+//   });
+
+//   socket.on('message', async (data) => {
+//     const { userId, message } = data;
+//     console.log('Received message:', data);
+
+//     // Publish the notification to the user's channel
+//     await pubClient.publish(`user:${userId}`, message);
+
+//     // If the user is not online, add the notification to the user's list
+//     if (!io.sockets.adapter.rooms.get(`user:${userId}`)) {
+//       await pubClient.rpush(`notifications:${userId}`, message);
+//     }
+//   });
+
+//   socket.on('disconnect', () => {
+//     console.log('Client disconnected');
+//   });
+// });
+
+// let pubClient, subClient;
+
+// (async () => {
+//   pubClient = createClient({ url: "redis://localhost:6379" });
+//   subClient = pubClient.duplicate();
+
+//   pubClient.on('error', (err) => console.error('Redis Pub Client Error:', err));
+//   subClient.on('error', (err) => console.error('Redis Sub Client Error:', err));
+
+//   await Promise.all([pubClient.connect(), subClient.connect()]);
+
+//   io.adapter(createAdapter(pubClient, subClient));
+
+//   const port = process.env.PORT || 4000;
+//   server.listen(port, () => {
+//     console.log(`Server listening on port ${port}`);
+//   });
+
+//   process.on('SIGINT', async () => {
+//     console.log('SIGINT signal received.');
+//     await shutdown();
+//   });
+
+//   process.on('SIGTERM', async () => {
+//     console.log('SIGTERM signal received.');
+//     await shutdown();
+//   });
+// })();
+
+// async function shutdown() {
+//   console.log('Shutting down server...');
+//   io.close(() => {
+//     console.log('Socket.IO server closed.');
+//     server.close(async () => {
+//       console.log('HTTP server closed.');
+//       await pubClient.disconnect();
+//       await subClient.disconnect();
+//       console.log('Redis clients disconnected.');
+//       process.exit(0);
+//     });
+//   });
+// }
+
+
+
+
+
+
+
+
+
+
+// import express from 'express';
+// import { createServer } from 'node:http';
+// import { join } from 'node:path';
+// import { Server } from 'socket.io';
+// import { createClient } from 'redis';
+// import { createAdapter } from '@socket.io/redis-adapter';
+// import cors from 'cors';
+
+// const app = express();
+// app.use(cors({ origin: 'http://localhost:5173' }));
+
+// const server = createServer(app);
+
+// const localDomains = [
+//   'http://localhost:3000',
+// ];
+
+// const io = new Server(server, {
+//   cors: {
+//     origin: 'http://localhost:5173',
+//   },
+//   maxHttpBufferSize: 1e8,
+// });
+
+// app.get('/', (req, res) => {
+//   res.sendFile(join(__dirname, 'index.html'));
+// });
+
+// io.on('connection', (socket) => {
+//   console.log('A new client connected');
+
+//   socket.on('join', async (userId) => {
+//     socket.join(userId);
+
+//     // Fetch and send pending notifications
+//     const notifications = await pubClient.sendCommand(['LRANGE', `notifications:${userId}`, 0, -1]);
+//     notifications.forEach((notification) => {
+//       socket.emit('message', notification);
+//     });
+
+//     // Remove the notifications from the list after sending
+//     await pubClient.sendCommand(['DEL', `notifications:${userId}`]);
+//   });
+
+//   socket.on('message', async (data) => {
+//     const { userId, message } = data;
+//     console.log('Received message:', data);
+
+//     // Publish the notification to the user's channel
+//     await pubClient.publish(`user:${userId}`, message);
+
+//     // If the user is not online, add the notification to the user's list
+//     if (!io.sockets.adapter.rooms.get(`user:${userId}`)) {
+//       await pubClient.sendCommand(['RPUSH', `notifications:${userId}`, message]);
+//     }
+//   });
+
+//   socket.on('disconnect', () => {
+//     console.log('Client disconnected');
+//   });
+// });
+
+// let pubClient, subClient;
+
+// (async () => {
+//   pubClient = createClient({ url: "redis://localhost:6379" });
+//   subClient = pubClient.duplicate();
+
+//   pubClient.on('error', (err) => console.error('Redis Pub Client Error:', err));
+//   subClient.on('error', (err) => console.error('Redis Sub Client Error:', err));
+
+//   await Promise.all([pubClient.connect(), subClient.connect()]);
+
+//   io.adapter(createAdapter(pubClient, subClient));
+
+//   const port = process.env.PORT || 4000;
+//   server.listen(port, () => {
+//     console.log(`Server listening on port ${port}`);
+//   });
+
+//   process.on('SIGINT', async () => {
+//     console.log('SIGINT signal received.');
+//     await shutdown();
+//   });
+
+//   process.on('SIGTERM', async () => {
+//     console.log('SIGTERM signal received.');
+//     await shutdown();
+//   });
+// })();
+
+// async function shutdown() {
+//   console.log('Shutting down server...');
+//   io.close(() => {
+//     console.log('Socket.IO server closed.');
+//     server.close(async () => {
+//       console.log('HTTP server closed.');
+//       await pubClient.disconnect();
+//       await subClient.disconnect();
+//       console.log('Redis clients disconnected.');
+//       process.exit(0);
+//     });
+//   });
+// }
+
+
+
+
+// import express from 'express';
+// import { createServer } from 'node:http';
+// import { join } from 'node:path';
+// import { Server } from 'socket.io';
+// import { createClient } from 'redis';
+// import { createAdapter } from '@socket.io/redis-adapter';
+// import cors from 'cors';
+// import { Queue, Worker } from 'bullmq'
+
+// const app = express();
+// app.use(cors({ origin: 'http://localhost:5173' }));
+
+// const server = createServer(app);
+
+// const localDomains = [
+//   'http://localhost:3000',
+// ];
+
+// const io = new Server(server, {
+//   cors: {
+//     origin: 'http://localhost:5173',
+//   },
+//   maxHttpBufferSize: 1e8,
+// });
+
+// const myQueue = new Queue('myqueue', { connection: {
+//   host: "myredis.taskforce.run",
+//   port: 32856
+// }});
+
+// const myWorker = new Worker('myqueue', async (job)=>{}, { connection: {
+//   host: "myredis.taskforce.run",
+//   port: 32856
+// }});
+
+// app.get('/', (req, res) => {
+//   res.sendFile(join(__dirname, 'index.html'));
+// });
+
+// const redisClient = createClient({ url: "redis://localhost:6379" });
+// // const queue = new Queue('message_queue', redisClient);
+
+
+// io.on('connection', (socket) => {
+//   console.log('A new client connected');
+
+//   socket.on('join', async (userId) => {
+//     socket.join(userId);
+
+//     // Fetch and send pending notifications
+//     // const notifications = await redisClient.lPush(['LRANGE', `notifications:${userId}`, 0, -1]);
+//     const myQueue = new Queue('myqueue', { connection });
+//     const notifications = await myQueue.add("" , socket.message);
+
+//     notifications.forEach((notification) => {
+//       socket.emit('message', notification);
+//     });
+
+//     // Remove the notifications from the list after sending
+//     await redisClient.rPop(['DEL', `notifications:${userId}`]);
+//   });
+
+//   socket.on('message', async (data) => {
+//     const { userId, message } = data;
+//     console.log('Received message:', data);
+
+//     // Add message to queue
+//     // await queue.enqueue({ userId, message });
+    
+
+//     // Process queue
+//     processQueue();
+//   });
+
+//   socket.on('disconnect', () => {
+//     console.log('Client disconnected');
+//   });
+// });
+
+// async function processQueue() {
+//   // Dequeue message
+//   const message = await queue.dequeue();
+
+//   if (message) {
+//     const { userId, message: msg } = message;
+
+//     // Publish the notification to the user's channel
+//     await redisClient.publish(`user:${userId}`, msg);
+
+//     // If the user is not online, add the notification to the user's list
+//     if (!io.sockets.adapter.rooms.get(`user:${userId}`)) {
+//       await redisClient.sendCommand(['RPUSH', `notifications:${userId}`, msg]);
+//     }
+//   }
+// }
+
+// redisClient.on('error', (err) => console.error('Redis Client Error:', err));
+
+// (async () => {
+//   await redisClient.connect();
+
+//   const port = process.env.PORT || 4000;
+//   server.listen(port, () => {
+//     console.log(`Server listening on port ${port}`);
+//   });
+
+//   process.on('SIGINT', async () => {
+//     console.log('SIGINT signal received.');
+//     await shutdown();
+//   });
+
+//   process.on('SIGTERM', async () => {
+//     console.log('SIGTERM signal received.');
+//     await shutdown();
+//   });
+// })();
+
+// async function shutdown() {
+//   console.log('Shutting down server...');
+//   io.close(() => {
+//     console.log('Socket.IO server closed.');
+//     server.close(async () => {
+//       console.log('HTTP server closed.');
+//       await redisClient.disconnect();
+//       console.log('Redis client disconnected.');
+//       process.exit(0);
+//     });
+//   });
+// }
+
+
 import express from 'express';
 import { createServer } from 'node:http';
 import { join } from 'node:path';
@@ -6,83 +449,57 @@ import { Server } from 'socket.io';
 import { createClient } from 'redis';
 import { createAdapter } from '@socket.io/redis-adapter';
 import cors from 'cors';
+import http from 'http';
 
 const app = express();
-app.use(cors({ origin: 'http://localhost:5173' }));
-
-const server = createServer(app);
-
-const localDomains = [
-  'http://localhost:3000',
-];
-
+app.use(express.json());
+const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-
-    origin: 'http://localhost:5173',
-
+    origin: 'http://localhost:5173', 
 
   },
-  maxHttpBufferSize: 1e8,
 });
 
-app.get('/', (req, res) => {
-  res.sendFile(join(__dirname, 'index.html'));
-});
+const PORT = 4000;
+
+app.use(cors());
+
+
+const notifications = [
+];
 
 io.on('connection', (socket) => {
-  console.log('A new client connected');
+  console.log(`User connected: ${socket.id}`);
 
-  socket.on('message', (data) => {
-    console.log('Received message:', data);
-    io.emit('message', data);
+  socket.on('join', (userId) => {
+    console.log(`User joined: ${userId}`);
+    socket.join(userId);
+
+    notifications
+      .filter((n) => n.userId === userId)
+      .forEach((notification) => {
+        socket.emit('message', notification.message);
+      });
   });
 
   socket.on('disconnect', () => {
-    console.log('Client disconnected');
+    console.log('User disconnected');
   });
 });
 
-let pubClient, subClient;
 
-(async () => {
-  pubClient = createClient({ url: "redis://localhost:6379" });
-  subClient = pubClient.duplicate();
+app.post('/notify', (req, res) => {
+  const { message, userId } = req.body; 
+  if (!message || !userId) {
+    return res.status(400).send({ error: 'Message and userId are required' });
+  }
 
-  pubClient.on('error', (err) => console.error('Redis Pub Client Error:', err));
-  subClient.on('error', (err) => console.error('Redis Sub Client Error:', err));
+  notifications.push({ id: Date.now(), message, userId });
+  io.to(userId).emit('message', message);
+  res.status(200).send({ success: true });
+});
 
-  await Promise.all([pubClient.connect(), subClient.connect()]);
-
-  io.adapter(createAdapter(pubClient, subClient));
-
-  const port = process.env.PORT || 4000;
-  server.listen(port, () => {
-    console.log(`Server listening on port ${port}`);
-  });
-
-
-  process.on('SIGINT', async () => {
-    console.log('SIGINT signal received.');
-    await shutdown();
-  });
-
-  process.on('SIGTERM', async () => {
-    console.log('SIGTERM signal received.');
-    await shutdown();
-  });
-})();
-
-async function shutdown() {
-  console.log('Shutting down server...');
-  io.close(() => {
-    console.log('Socket.IO server closed.');
-    server.close(async () => {
-      console.log('HTTP server closed.');
-      await pubClient.disconnect();
-      await subClient.disconnect();
-      console.log('Redis clients disconnected.');
-      process.exit(0);
-    });
-  });
-}
+server.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});
