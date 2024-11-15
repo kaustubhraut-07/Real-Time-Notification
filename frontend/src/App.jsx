@@ -9,10 +9,10 @@ const App = () => {
 
   return (
     <SocketProvider>
-      <div style={{ top : '0' , position: 'relative' }}>
+      {/* <div style={{ position: 'relative' }}> */}
         <NotificationIcon onClick={() => setPanelOpen(!isPanelOpen)} />
         <NotificationPanel isOpen={isPanelOpen} />
-      </div>
+      {/* </div> */}
     </SocketProvider>
   );
 };

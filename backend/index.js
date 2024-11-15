@@ -5,8 +5,11 @@ import { join } from 'node:path';
 import { Server } from 'socket.io';
 import { createClient } from 'redis';
 import { createAdapter } from '@socket.io/redis-adapter';
+import cors from 'cors';
 
 const app = express();
+app.use(cors({ origin: 'http://localhost:5173' }));
+
 const server = createServer(app);
 
 const localDomains = [
@@ -15,8 +18,10 @@ const localDomains = [
 
 const io = new Server(server, {
   cors: {
-    credentials: true,
-    origin: localDomains
+
+    origin: 'http://localhost:5173',
+
+
   },
   maxHttpBufferSize: 1e8,
 });
@@ -30,7 +35,7 @@ io.on('connection', (socket) => {
 
   socket.on('message', (data) => {
     console.log('Received message:', data);
-    io.emit('message', data); 
+    io.emit('message', data);
   });
 
   socket.on('disconnect', () => {
@@ -56,7 +61,7 @@ let pubClient, subClient;
     console.log(`Server listening on port ${port}`);
   });
 
-  
+
   process.on('SIGINT', async () => {
     console.log('SIGINT signal received.');
     await shutdown();

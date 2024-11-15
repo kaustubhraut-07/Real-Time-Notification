@@ -9,13 +9,18 @@ export const SocketProvider = ({ children }) => {
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
-    const socket = io('http://localhost:3000'); // Change this to your server address
+    const socket = io('http://localhost:4000/' , {
+      cors: {
+        origin: "http//localhost:4000",
+    }
+    }); 
 
     socket.on('connect', () => {
       console.log('Connected to server');
     });
 
     socket.on('message', (data) => {
+      console.log('Received message:', data);
       setNotifications((prev) => [data, ...prev]);
       setUnreadCount((count) => count + 1); 
     });

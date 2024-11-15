@@ -4,6 +4,7 @@ import { useSocket } from './SocketProvider';
 
 const NotificationPanel = ({ isOpen }) => {
   const { notifications, markAllAsRead } = useSocket();
+  console.log(notifications  , "notifications");
 
   if (!isOpen) return null;
 
@@ -38,7 +39,7 @@ const NotificationPanel = ({ isOpen }) => {
               marginBottom: '5px',
             }}
           >
-            <p>{notification.message}</p>
+            <p>{notification}</p>
             <span style={{ fontSize: '12px', color: 'gray' }}>{notification.timestamp}</span>
           </div>
         ))
