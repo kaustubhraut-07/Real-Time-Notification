@@ -60,7 +60,7 @@ export const SocketProvider = ({ children }) => {
   useEffect(() => {
     const socket = io('http://localhost:4000/');
 
-    const userId = 'user123'; 
+    const userId = '56'; 
 
     socket.on('connect', () => {
       console.log('Connected to server');

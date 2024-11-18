@@ -442,22 +442,86 @@
 // }
 
 
+// import express from 'express';
+// import { Server } from 'socket.io';
+// import cors from 'cors';
+// import http from 'http';
+// import { Queue } from 'bullmq';
+
+
+// const app = express();
+// app.use(express.json());
+// const server = http.createServer(app);
+// const myQueue = new Queue('myqueue');
+
+// const io = new Server(server, {
+//   cors: {
+//     origin: 'http://localhost:5173', 
+
+//   },
+// });
+
+// const PORT = 4000;
+
+// app.use(cors());
+
+
+// const notifications = [];
+
+// io.on('connection', (socket) => {
+//   console.log(`User connected: ${socket.id}`);
+
+//   socket.on('join', (userId) => {
+//     console.log(`User joined: ${userId}`);
+//     socket.join(userId);
+
+//     // notifications
+//     //   .filter((n) => n.userId === userId)
+//     //   .forEach((notification) => {
+//     //     socket.emit('message', notification.message);
+//     //   });
+//        myQueue.add('message' , socket.message);
+//   });
+
+//   socket.on('disconnect', () => {
+//     console.log('User disconnected');
+//   });
+// });
+
+
+// app.post('/notify', (req, res) => {
+//   const { message, userId } = req.body; 
+//   if (!message || !userId) {
+//     return res.status(400).send({ error: 'Message and userId are required' });
+//   }
+
+//   // notifications.push({ id: Date.now(), message, userId });
+//   myQueue.add( 'notification' , {id: Date.now(), message, userId });
+//   io.to(userId).emit('message', message);
+//   res.status(200).send({ success: true });
+// });
+
+// server.listen(PORT, () => {
+//   console.log(`Server running on http://localhost:${PORT}`);
+// });
+
+
 import express from 'express';
-import { createServer } from 'node:http';
-import { join } from 'node:path';
 import { Server } from 'socket.io';
-import { createClient } from 'redis';
-import { createAdapter } from '@socket.io/redis-adapter';
 import cors from 'cors';
 import http from 'http';
+import { Queue } from 'bullmq';
 
 const app = express();
 app.use(express.json());
 const server = http.createServer(app);
+const myQueue = new Queue('myqueue', {
+  connection: { host: '127.0.0.1', port: 6379 }, // Redis config
+});
+
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:5173', 
-
+    origin: 'http://localhost:5173',
   },
 });
 
@@ -465,41 +529,62 @@ const PORT = 4000;
 
 app.use(cors());
 
-
-const notifications = [
-];
+// Track connected users
+const connectedUsers = new Map();
 
 io.on('connection', (socket) => {
   console.log(`User connected: ${socket.id}`);
 
+  // User joins with their userId
   socket.on('join', (userId) => {
     console.log(`User joined: ${userId}`);
-    socket.join(userId);
-
-    notifications
-      .filter((n) => n.userId === userId)
-      .forEach((notification) => {
-        socket.emit('message', notification.message);
-      });
+    connectedUsers.set(userId, socket.id); // Map userId to socket.id
+    socket.join(userId); // Add user to their own room
   });
 
   socket.on('disconnect', () => {
-    console.log('User disconnected');
+    console.log(`User disconnected: ${socket.id}`);
+    connectedUsers.forEach((id, userId) => {
+      if (id === socket.id) connectedUsers.delete(userId);
+    });
   });
 });
 
+// Endpoint to send notifications to a specific user
+app.post('/notify', async (req, res) => {
+  const { message, userId } = req.body;
 
-app.post('/notify', (req, res) => {
-  const { message, userId } = req.body; 
   if (!message || !userId) {
     return res.status(400).send({ error: 'Message and userId are required' });
   }
 
-  notifications.push({ id: Date.now(), message, userId });
-  io.to(userId).emit('message', message);
-  res.status(200).send({ success: true });
+  try {
+    await myQueue.add('notification', { message, userId }, { attempts: 5, backoff: 5000 });
+    res.status(200).send({ success: true });
+  } catch (error) {
+    console.error('Failed to add job to queue:', error);
+    res.status(500).send({ error: 'Internal Server Error' });
+  }
+});
+
+// Endpoint to broadcast notifications to all users
+app.post('/broadcast', async (req, res) => {
+  const { message } = req.body;
+
+  if (!message) {
+    return res.status(400).send({ error: 'Message is required' });
+  }
+
+  try {
+    await myQueue.add('broadcast', { message }, { attempts: 5, backoff: 5000 });
+    res.status(200).send({ success: true });
+  } catch (error) {
+    console.error('Failed to add broadcast job:', error);
+    res.status(500).send({ error: 'Internal Server Error' });
+  }
 });
 
 server.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
+
