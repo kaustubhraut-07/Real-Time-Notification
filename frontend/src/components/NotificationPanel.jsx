@@ -39,7 +39,8 @@ const NotificationPanel = ({ isOpen }) => {
               marginBottom: '5px',
             }}
           >
-            <p>{notification}</p>
+            <p>{notification.message
+            }</p>
             <span style={{ fontSize: '12px', color: 'gray' }}>{notification.timestamp}</span>
           </div>
         ))

@@ -70,11 +70,12 @@ export const SocketProvider = ({ children }) => {
     socket.on('message', (data) => {
       console.log('Received message:', data);
 
-      if (!seenMessages.current[data]) {
+      // if (!seenMessages.current[data]) {
+        console.log('New message:', data , seenMessages.current[data]);
         setNotifications((prev) => [data, ...prev]);
         setUnreadCount((count) => count + 1);
-        seenMessages.current[data] = true;
-      }
+        // seenMessages.current[data] = true;
+      // }
     });
 
     return () => {
